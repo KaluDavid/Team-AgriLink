@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "../ui/tooltip";
@@ -21,7 +21,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>{children}</TooltipProvider>
+      <TooltipProvider>
+        <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+      </TooltipProvider>
       <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
   );

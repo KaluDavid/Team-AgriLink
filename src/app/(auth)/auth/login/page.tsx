@@ -28,11 +28,11 @@ export default function LoginPage() {
       toast.success("Welcome back!");
       const from = searchParams.get("from");
       router.push(from ?? getDashboardPath());
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error("Login failed", {
         description:
-          err.message ??
-          "Try: farmer@demo.com, buyer@demo.com, or admin@demo.com / password",
+          (err instanceof Error ? err.message : String(err)) ||
+          "An error occurred while trying to log in. Please try again.",
       });
     } finally {
       setIsLoading(false);
