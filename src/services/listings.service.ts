@@ -26,18 +26,27 @@ export const listingsService = {
     limit?: number;
     status?: ListingStatus;
     search?: string;
-  }) => api.get<ListingsResponse>("/listings", { params }).then((r) => r.data),
+  }): Promise<ListingsResponse> =>
+    api.get("/listings", { params }).then((r) => r.data),
 
-  getById: (id: string) =>
-    api.get<Listing>(`/listings/${id}`).then((r) => r.data),
+  getById: (id: string): Promise<Listing> =>
+    api.get(`/listings/${id}`).then((r) => r.data),
 
-  getMyListings: () => api.get<Listing[]>("/listings/my").then((r) => r.data),
+  getMyListings: (): Promise<Listing[]> =>
+    api.get("/listings/my").then((r) => r.data),
 
-  create: (payload: CreateListingPayload) =>
-    api.post<Listing>("/listings", payload).then((r) => r.data),
+  search: (query: string): Promise<Listing[]> =>
+    api.get("/listings/search", { params: { q: query } }).then((r) => r.data),
 
-  update: (id: string, payload: UpdateListingPayload) =>
-    api.patch<Listing>(`/listings/${id}`, payload).then((r) => r.data),
+  create: (payload: CreateListingPayload): Promise<Listing> =>
+    api.post("/listings", payload).then((r) => r.data),
 
-  delete: (id: string) => api.delete(`/listings/${id}`).then((r) => r.data),
+  update: (id: string, payload: UpdateListingPayload): Promise<Listing> =>
+    api.put(`/listings/${id}`, payload).then((r) => r.data),
+
+  updateStatus: (id: string, status: ListingStatus): Promise<Listing> =>
+    api.patch(`/listings/${id}/status`, { status }).then((r) => r.data),
+
+  delete: (id: string): Promise<void> =>
+    api.delete(`/listings/${id}`).then(() => undefined),
 };

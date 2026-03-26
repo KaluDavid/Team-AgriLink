@@ -3,7 +3,8 @@
 import { useAuthStore } from "@/store/authStore";
 import {
   useFarmerOrders,
-  useUpdateOrderStatusMutation,
+  useAcceptOrderMutation,
+  useRejectOrderMutation,
 } from "@/queries/orders.queries";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -15,12 +16,8 @@ import { ShieldCheck, CheckCircle2, Package, X } from "lucide-react";
 export default function FarmerOrdersPage() {
   const user = useAuthStore((s) => s.user);
   const { data: orders = [], isLoading } = useFarmerOrders(user?.id);
-  const updateStatus = useUpdateOrderStatusMutation();
-
-  const accept = (id: string) =>
-    updateStatus.mutate({ id, status: "accepted" });
-  const reject = (id: string) =>
-    updateStatus.mutate({ id, status: "cancelled" });
+  const accept = useAcceptOrderMutation();
+  const reject = useRejectOrderMutation();
 
   if (isLoading) {
     return (
@@ -47,7 +44,6 @@ export default function FarmerOrdersPage() {
             const imageUrl =
               cropImages[order.cropName] ||
               "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=200&h=150&fit=crop";
-            const isPending = updateStatus.isPending;
 
             return (
               <div
@@ -92,18 +88,18 @@ export default function FarmerOrdersPage() {
                         <div className="flex gap-2 *:py-5.5 *:px-6 *:cursor-pointer">
                           <Button
                             variant="outline"
-                            onClick={() => reject(order.id)}
-                            disabled={isPending}
+                            onClick={() => reject.mutate(order.id)}
+                            disabled={reject.isPending || accept.isPending}
                           >
                             <X className="h-4 w-4 mr-2" />
                             Reject
                           </Button>
                           <Button
-                            onClick={() => accept(order.id)}
-                            disabled={isPending}
+                            onClick={() => accept.mutate(order.id)}
+                            disabled={accept.isPending || reject.isPending}
                           >
                             <CheckCircle2 className="h-4 w-4 mr-2" />
-                            {isPending ? "Updating..." : "Accept Order"}
+                            {accept.isPending ? "Updating..." : "Accept Order"}
                           </Button>
                         </div>
                       )}

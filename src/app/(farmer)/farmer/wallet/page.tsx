@@ -1,8 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@/store/authStore";
-import { useFarmerOrders } from "@/queries/orders.queries";
-import { useWalletBalance } from "@/queries/payments.queries";
+import { useWalletBalance, useTransactions } from "@/queries/payments.queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,29 +16,15 @@ import {
 
 export default function FarmerWalletPage() {
   const user = useAuthStore((s) => s.user);
-  const { data: orders = [], isLoading: ordersLoading } = useFarmerOrders(
-    user?.id,
-  );
   const { data: balance, isLoading: balanceLoading } = useWalletBalance(
     user?.id,
   );
+  const { data: transactions = [], isLoading: txLoading } = useTransactions();
 
-  const isLoading = ordersLoading || balanceLoading;
+  const isLoading = balanceLoading || txLoading;
 
-  const available =
-    balance?.available ??
-    orders
-      .filter((o) => o.escrowStatus === "released")
-      .reduce((s, o) => s + o.totalAmount, 0);
-
-  const pending =
-    balance?.pending ??
-    orders
-      .filter((o) => o.escrowStatus === "held")
-      .reduce((s, o) => s + o.totalAmount, 0);
-
-  const released = orders.filter((o) => o.escrowStatus === "released");
-  const heldOrders = orders.filter((o) => o.escrowStatus === "held");
+  const available = balance?.available ?? 0;
+  const pending = balance?.pending ?? 0;
 
   if (isLoading) {
     return (
@@ -49,6 +34,7 @@ export default function FarmerWalletPage() {
           <Skeleton className="h-32 rounded-xl" />
         </div>
         <Skeleton className="h-20 rounded-xl" />
+        <Skeleton className="h-64 rounded-xl" />
       </div>
     );
   }
@@ -73,9 +59,6 @@ export default function FarmerWalletPage() {
             <div className="text-3xl font-bold">
               {formatCurrency(available)}
             </div>
-            <p className="text-xs text-white/70 mt-1">
-              From {released.length} completed orders
-            </p>
           </CardContent>
         </Card>
 
@@ -88,9 +71,6 @@ export default function FarmerWalletPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{formatCurrency(pending)}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              From {heldOrders.length} pending orders
-            </p>
           </CardContent>
         </Card>
       </div>
@@ -122,50 +102,52 @@ export default function FarmerWalletPage() {
 
       <div>
         <h2 className="text-xl font-semibold mb-4">Transaction History</h2>
-        {orders.length > 0 ? (
+        {transactions.length > 0 ? (
           <div className="bg-card border border-border rounded-xl divide-y divide-border">
-            {orders.map((order) => (
+            {transactions.map((tx) => (
               <div
-                key={order.id}
+                key={tx.id}
                 className="p-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-4">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      order.escrowStatus === "released"
+                      tx.status === "completed"
                         ? "bg-green-100"
                         : "bg-yellow-100"
                     }`}
                   >
-                    {order.escrowStatus === "released" ? (
+                    {tx.status === "completed" ? (
                       <ArrowDownLeft className="h-5 w-5 text-green-600" />
                     ) : (
                       <Clock className="h-5 w-5 text-yellow-600" />
                     )}
                   </div>
                   <div>
-                    <p className="font-medium">{order.cropName} sale</p>
+                    <p className="font-medium capitalize">
+                      {tx.type.replace("_", " ")}
+                    </p>
                     <p className="text-sm text-muted-foreground">
-                      {order.buyerName} • {formatDate(order.createdAt)}
+                      {formatDate(tx.createdAt)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p
-                    className={`font-semibold ${order.escrowStatus === "released" ? "text-green-600" : ""}`}
+                    className={`font-semibold ${tx.status === "completed" ? "text-green-600" : ""}`}
                   >
-                    +{formatCurrency(order.totalAmount)}
+                    {formatCurrency(tx.amount)}
                   </p>
                   <p className="text-xs text-muted-foreground flex items-center justify-end gap-1">
-                    {order.escrowStatus === "released" ? (
+                    {tx.status === "completed" ? (
                       <>
                         <CheckCircle2 className="h-3 w-3" />
-                        Released
+                        Completed
                       </>
                     ) : (
                       <>
                         <Clock className="h-3 w-3" />
-                        In Escrow
+                        Pending
                       </>
                     )}
                   </p>

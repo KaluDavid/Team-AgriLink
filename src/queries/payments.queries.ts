@@ -1,8 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  paymentsService,
-  InitiatePaymentPayload,
-} from "@/services/payments.service";
+import { paymentsService } from "@/services/payments.service";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { mockOrders } from "@/lib/mockData";
 import { toast } from "sonner";
@@ -12,9 +9,9 @@ const API_READY = process.env.NEXT_PUBLIC_API_READY === "true";
 export function useTransactions() {
   return useQuery({
     queryKey: QUERY_KEYS.transactions.all,
-    queryFn: paymentsService.getAll,
+    queryFn: paymentsService.getTransactions,
     enabled: API_READY,
-    placeholderData: mockOrders,
+    placeholderData: [],
   });
 }
 
@@ -30,15 +27,8 @@ export function useWalletBalance(userId?: string) {
       pending: mockOrders
         .filter((o) => o.escrowStatus === "held")
         .reduce((s, o) => s + o.totalAmount, 0),
+      total_earned: 0,
     },
-  });
-}
-
-export function useInitiatePaymentMutation() {
-  return useMutation({
-    mutationFn: (payload: InitiatePaymentPayload) =>
-      paymentsService.initiate(payload),
-    onError: () => toast.error("Payment initiation failed"),
   });
 }
 
@@ -48,11 +38,13 @@ export function useReleaseEscrowMutation() {
     mutationFn: (orderId: string) => paymentsService.releaseEscrow(orderId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUERY_KEYS.transactions.all });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.orders.all });
       toast.success("Escrow released", {
         description: "Payment sent to farmer.",
       });
     },
-    onError: () => toast.error("Failed to release escrow"),
+    onError: (err: Error) =>
+      toast.error("Failed to release escrow", { description: err.message }),
   });
 }
 
@@ -62,10 +54,12 @@ export function useRefundMutation() {
     mutationFn: (orderId: string) => paymentsService.refund(orderId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUERY_KEYS.transactions.all });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.orders.all });
       toast.success("Refund processed", {
         description: "Payment returned to buyer.",
       });
     },
-    onError: () => toast.error("Failed to process refund"),
+    onError: (err: Error) =>
+      toast.error("Failed to process refund", { description: err.message }),
   });
 }
