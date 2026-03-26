@@ -47,11 +47,11 @@ export default function LandingPage() {
   if (isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen *:flex *:flex-col *:justify-center *:items-center bg-background">
+    <div className="min-h-screen *:px-3.5 *:sm:px-12.5 *:2xl:px-auto *:flex *:flex-col *:justify-center *:items-center bg-background">
       <Navbar />
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden ">
         <div className="absolute inset-0 bg-cover bg-center bg-[url('/hero-farm.jpg')]">
           <div className="absolute inset-0 bg-linear-to-r from-primary/95 via-primary/85 to-primary/70" />
         </div>
@@ -63,8 +63,9 @@ export default function LandingPage() {
                 Farm-to-Market, Direct
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-              Connect. Trade.<span className="block">Grow Together.</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight *:whitespace-nowrap">
+              <span> Connect. Trade.</span>
+              <span className="block">Grow Together.</span>
             </h1>
             <p className="text-md md:text-lg text-white/85 max-w-lg">
               The trusted marketplace where farmers list produce and buyers
@@ -74,7 +75,7 @@ export default function LandingPage() {
               <Button
                 asChild
                 size="lg"
-                className="hover:bg-white text-white bg-gradient-hero font-semibold shadow-lg px-8 py-5.5"
+                className=" text-white .btn-hero font-semibold shadow-lg px-8 py-5.5"
               >
                 <Link href={ROUTES.REGISTER}>
                   Start Selling <ArrowRight className="ml-2 h-5 w-5" />
@@ -83,18 +84,18 @@ export default function LandingPage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-accent hover:border-black hover:!bg-white text-accent-foreground border-white/50 border  font-semibold px-8 py-5.5"
+                className="bg-accent hover:border-black hover:bg-white! text-accent-foreground border-white/50 border  font-semibold px-8 py-5.5"
               >
                 <Link href={ROUTES.BUYER.MARKETPLACE}>Browse Produce</Link>
               </Button>
             </div>
-            <div className="flex items-center gap-8 pt-4">
+            <div className="flex items-center gap-4 sm:gap-8 pt-4">
               {[
                 { v: "500+", l: "Farmers" },
                 { v: "1,200+", l: "Buyers" },
                 { v: "₦50M+", l: "Traded" },
               ].map((s, i, a) => (
-                <div key={s.l} className="flex items-center gap-8">
+                <div key={s.l} className="flex items-center gap-4 sm:gap-8">
                   <div className="text-white">
                     <div className="text-2xl font-bold">{s.v}</div>
                     <div className="text-sm text-white/70">{s.l}</div>
@@ -114,7 +115,7 @@ export default function LandingPage() {
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="section-title mb-4">How It Works</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-[15px] max-w-2xl mx-auto">
               Simple, secure, and straightforward trading for everyone
             </p>
           </div>
@@ -151,14 +152,14 @@ export default function LandingPage() {
       {/* Featured listings */}
       <section className="py-16 md:py-24">
         <div className="container">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex sm:flex-row flex-col space-y-7 sm:space-y-0 sm:items-center justify-between mb-8">
             <div>
-              <h2 className="section-title mb-2">Fresh Produce</h2>
-              <p className="text-muted-foreground">
+              <h2 className="section-title sm:mb-2">Fresh Produce</h2>
+              <p className="text-muted-foreground text-[15px]">
                 Browse the latest from our farmers
               </p>
             </div>
-            <Button className="bg-white py-5 border px-4 text-foreground *:flex *:gap-2 *:items-center ">
+            <Button className="bg-white py-5 border px-4 text-foreground w-fit *:flex *:gap-2 *:items-center ">
               <Link href={ROUTES.BUYER.MARKETPLACE}>
                 View All <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -218,7 +219,7 @@ export default function LandingPage() {
         <div className="container">
           <div className="bg-secondary rounded-3xl p-8 md:p-12 text-center">
             <h2 className="section-title mb-4">Ready to Start Trading?</h2>
-            <p className="text-muted-foreground text-base mb-8 max-w-xl mx-auto">
+            <p className="text-muted-foreground text-[15px] mb-8 max-w-xl mx-auto">
               Join thousands of farmers and buyers already using AgriLink to
               grow their business.
             </p>

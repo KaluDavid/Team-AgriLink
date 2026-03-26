@@ -40,9 +40,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex fixed top-0 left-0 w-full">
       <div className="flex-1 flex items-center w-full justify-center p-8 overflow-auto">
-        <div className="w-full max-w-md overflow-y-scroll space-y-8">
+        <div className="w-full max-w-md overflow-y-scroll space-y-8 border px-8 shadow-sm rounded-md py-10">
           <div className="text-center">
             <Link
               href={ROUTES.HOME}
