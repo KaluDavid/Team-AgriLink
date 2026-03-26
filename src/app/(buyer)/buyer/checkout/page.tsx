@@ -4,10 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useCreateOrderMutation } from "@/queries/orders.queries";
 import { Button } from "@/components/ui/button";
 import { mockListings, cropImages } from "@/lib/mockData";
 import { formatCurrency } from "@/lib/utils";
-import { toast } from "sonner";
 import { ROUTES } from "@/constants/routes";
 import {
   ArrowLeft,
@@ -21,12 +21,12 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
+  const createOrder = useCreateOrderMutation();
 
-  const listingId = searchParams.get("listingId");
+  const listingId = searchParams.get("listingId") ?? "";
   const quantity = parseInt(searchParams.get("quantity") || "1");
   const listing = mockListings.find((l) => l.id === listingId);
 
-  const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
   if (!listing) {
@@ -47,16 +47,12 @@ export default function CheckoutPage() {
   const serviceFee = Math.round(subtotal * 0.02);
   const total = subtotal + serviceFee;
 
-  const handlePayment = async () => {
-    setIsProcessing(true);
-    await new Promise((r) => setTimeout(r, 2000));
-    setIsProcessing(false);
-    setIsComplete(true);
-    toast.success("Order placed!", {
-      description: "Payment held in escrow until delivery.",
-    });
+  const handlePayment = () => {
+    createOrder.mutate(
+      { listingId: listing.id, quantity },
+      { onSuccess: () => setIsComplete(true) },
+    );
   };
-
   if (isComplete) {
     return (
       <div className="container py-16">
@@ -179,9 +175,9 @@ export default function CheckoutPage() {
               size="lg"
               className="w-full h-14 text-lg"
               onClick={handlePayment}
-              disabled={isProcessing}
+              disabled={createOrder.isPending}
             >
-              {isProcessing ? (
+              {createOrder.isPending ? (
                 <>
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                   Processing...

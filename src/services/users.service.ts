@@ -2,16 +2,24 @@ import api from "@/lib/axios";
 import { User } from "@/types";
 
 export const usersService = {
-  getAll: () => api.get<User[]>("/users").then((r) => r.data),
+  getAll: (): Promise<User[]> => api.get("/admin/users").then((r) => r.data),
 
-  getById: (id: string) => api.get<User>(`/users/${id}`).then((r) => r.data),
+  getById: (id: string): Promise<User> =>
+    api.get(`/admin/users/${id}`).then((r) => r.data),
 
-  updateProfile: (payload: Partial<Pick<User, "name" | "location">>) =>
-    api.patch<User>("/users/me", payload).then((r) => r.data),
+  suspend: (id: string): Promise<void> =>
+    api.post(`/admin/users/${id}/suspend`).then(() => undefined),
 
-  suspend: (id: string) =>
-    api.patch(`/users/${id}/suspend`).then((r) => r.data),
+  activate: (id: string): Promise<void> =>
+    api.post(`/admin/users/${id}/activate`).then(() => undefined),
 
-  unsuspend: (id: string) =>
-    api.patch(`/users/${id}/unsuspend`).then((r) => r.data),
+  verify: (id: string): Promise<void> =>
+    api.post(`/admin/users/${id}/verify`).then(() => undefined),
+
+  updateProfile: (
+    payload: Partial<Pick<User, "name" | "location">>,
+  ): Promise<User> => api.put("/auth/me", payload).then((r) => r.data),
+
+  search: (query: string): Promise<User[]> =>
+    api.get("/users", { params: { q: query } }).then((r) => r.data),
 };
