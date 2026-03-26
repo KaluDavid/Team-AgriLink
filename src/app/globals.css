@@ -280,7 +280,7 @@ body {
 
 .section-title {
   font-size: clamp(1.5rem, 3vw, 1.875rem);
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   color: hsl(var(--foreground));
   letter-spacing: -0.025em;
 }
@@ -315,4 +315,26 @@ body {
 /* HIDE SCROLL */
 ::-webkit-scrollbar {
   display: none;
+}
+
+@layer utilities {
+  .btn-hero {
+    @apply bg-primary text-primary-foreground shadow-lg transition-all duration-200 font-semibold text-base px-8 py-4 rounded-xl;
+  }
+
+  .btn-hero:hover {
+    @apply shadow-xl;
+    background-color: hsl(var(--primary) / 0.9);
+  }
+
+  .btn-hero-outline {
+    @apply transition-all duration-200 font-semibold text-base px-8 py-4 rounded-xl;
+    border: 2px solid hsl(var(--primary-foreground) / 0.3);
+    color: hsl(var(--primary-foreground));
+    backdrop-filter: blur(4px);
+  }
+
+  .btn-hero-outline:hover {
+    background-color: hsl(var(--primary-foreground) / 0.1);
+  }
 }
